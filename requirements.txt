@@ -1,3 +1,6 @@
 instabot==0.106.0
 python-dotenv==0.10.5
 tweepy==3.8.0
+pandas==0.25.3
+spacy==2.2.3
+matplotlib==3.1.2

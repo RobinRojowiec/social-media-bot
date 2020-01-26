@@ -14,6 +14,7 @@ from datetime import timedelta
 
 import tweepy
 from dotenv import load_dotenv
+from tqdm import tqdm
 from tweepy import Cursor
 
 from twitter.tweet import Tweet, TweetSet
@@ -46,10 +47,10 @@ tweet_set = TweetSet(twitter_handle, user.name, user.description, user.location)
 hashtags = []
 mentions = []
 tweet_count = 0
-end_date = datetime.utcnow() - timedelta(days=30)
-for status in Cursor(api.user_timeline, id=twitter_handle).items():
+end_date = datetime.utcnow() - timedelta(days=90)
+for status in tqdm(Cursor(api.user_timeline, id=twitter_handle).items()):
     tweet_count += 1
-    tweet = Tweet(twitter_handle, status.text, "", status.created_at.strftime("%c"))
+    tweet = Tweet(str(status.id), status.text, "", status.created_at.strftime("%c"))
     if hasattr(status, "entities"):
         entities = status.entities
         if "hashtags" in entities:

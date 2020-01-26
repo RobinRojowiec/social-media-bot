@@ -13,6 +13,7 @@ from datetime import datetime
 class TweetSet:
     def __init__(self, twitter_handle, name, description, location):
         self.twitter_handle = twitter_handle
+
         self.profile_name = name
         self.profile_description = description
         self.profile_location = location
@@ -24,8 +25,8 @@ class TweetSet:
 
 
 class Tweet:
-    def __init__(self, twitter_handle, text, url, date):
-        self.twitter_handle = twitter_handle
+    def __init__(self, tweet_id, text, url, date):
+        self.tweet_id = tweet_id
         self.text = text
         self.url = url
         self.date = date
@@ -40,7 +41,7 @@ class Tweet:
 
     def clean_text(self):
         for index, tag in enumerate(self.hashtags):
-            self.text = self.text.replace(tag, "[%i]" % index)
+            self.text = self.text.replace('#' + tag, "")
 
         for index, mention in enumerate(self.mentions):
-            self.text = self.text.replace(mention, "[%i]" % index)
+            self.text = self.text.replace('@' + mention, "")
