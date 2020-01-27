@@ -13,41 +13,40 @@ from collections import defaultdict
 from datetime import datetime
 
 import dotenv
+import numpy as np
 import pandas as pd
 import spacy
 from matplotlib import pyplot
 
-from term_document_matrix import TermDocumentMatrix
+from term_document_matrix import TermDocumentMatrix, filter_top_phrases
 
 nlp = spacy.load('en_core_web_sm')
 
 
 def text_analysis(tweets_filepath):
-    vocab = set()
-    docs = list()
-    matrix = TermDocumentMatrix()
+    matrix = TermDocumentMatrix(nlp)
 
     with open(tweets_filepath, 'r', encoding='utf8') as json_file:
         tweet_set = json.load(json_file)
 
         for tweet in tweet_set["tweets"]:
             text = tweet["text"].strip()
-            analyzed_text = nlp(text)
+            id = tweet["tweet_id"]
+            matrix.add_doc(id, text)
 
-            for token in analyzed_text:
-                vocab.add(token.lemma_)
+    phrases = matrix.get_most_frequent_phrases(2, 3)
+    top_phrases = filter_top_phrases(phrases, 20)
 
-            docs.append(tweet["tweet_id"])
+    objects = [x[0] for x in top_phrases]
+    y_pos = np.arange(len(objects))
+    performance = [x[1] for x in top_phrases]
 
-        for tweet in tweet_set["tweets"]:
-            text = tweet["text"].strip()
-            analyzed_text = nlp(text)
+    pyplot.bar(y_pos, performance, align='center', alpha=0.5)
+    pyplot.xticks(y_pos, objects, rotation=45)
+    pyplot.ylabel('Document Frequency')
+    pyplot.title('Terms')
 
-            for token in analyzed_text:
-                matrix.add_term(tweet["tweet_id"], token.lemma_)
-
-    matrix.finalize()
-    print(matrix)
+    pyplot.show()
 
 
 def general_stats(tweets_filepath):
@@ -93,5 +92,5 @@ if __name__ == '__main__':
     dotenv.load_dotenv()
     tweets_file = os.getenv('TWITTER_DATA')
 
-    # general_stats(tweets_file)
+    general_stats(tweets_file)
     text_analysis(tweets_file)
